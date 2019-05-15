@@ -35,4 +35,4 @@ publish() {
     popd
 }
 
-publish eks
+publish query

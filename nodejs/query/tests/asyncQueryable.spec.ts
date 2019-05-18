@@ -30,6 +30,9 @@ function assertRejects(done: MochaDone, p: Promise<any>) {
 
 describe("IterablePromise sources", () => {
     describe("range", () => {
+        //
+        // TODO: Throw error when range overlaps.
+        //
         it("produces an empty array for overlapping ranges", async () => {
             let xs = await range(0, 0).toArray();
             assert.deepEqual(xs, []);

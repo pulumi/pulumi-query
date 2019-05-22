@@ -27,25 +27,46 @@ import { AsyncQueryableImpl } from "./asyncQueryable";
 import { AsyncQueryable, AsyncQuerySource } from "./interfaces";
 import * as sources from "./sources";
 
-export { AsyncQueryable } from "./interfaces";
+export { AsyncQueryable, AsyncQueryableGrouping, OrderKey } from "./interfaces";
 
+/**
+ * Creates an `AsyncQueryable` from things that look `Iterable` or `AsyncIterable`, even if they're
+ * wrapped in a `Promise`.
+ * @param source Object to convert into an `AsyncQueryable`.
+ */
 export function from<TSource>(source: AsyncQuerySource<TSource>): AsyncQueryable<TSource> {
     return AsyncQueryableImpl.from(source);
 }
 
+/**
+ * Generates a (potentially infinite) sequence of integral numbers within a range. The first number
+ * emitted is `start`, and the last is `stop - 1`. If the enumerated sequence generates zero
+ * elements (for example, when `stop <= start + 1`), an exception is thrown.
+ * @param start Beginning of the range
+ * @param stop Non-inclusive end of the range.
+ * @example
+ * const squares = await range(0, 3).map(x => x * x).toArray(); // == [0, 1, 4]
+ */
 export function range(start: number, stop?: number): AsyncQueryable<number> {
     return AsyncQueryableImpl.from(sources.range(start, stop));
 }
 
+/**
+ * Returns an empty sequence of `TResult`.
+ * @example
+ * const noNumbers = await empty<number>().toArray(); // == []
+ */
 export function empty<TResult>(): AsyncIterableIterator<TResult> {
     return AsyncQueryableImpl.from(sources.from([]));
 }
 
-export function singleton<TSource>(t: TSource): AsyncIterableIterator<TSource> {
-    return AsyncQueryableImpl.from(sources.from([t]));
-}
-
-export function repeat<TSource>(t: TSource) {
+/**
+ * Generates a (potentially infinite) sequence by repeating a single value.
+ * @param t Object to repeat
+ * @example
+ * const ones = await repeat(1).take(3).toArray(); // == [1, 1, 1]
+ */
+export function repeat<TSource>(t: TSource /* TODO: add optional count. */) {
     AsyncQueryableImpl.from(
         (async function*() {
             while (true) {

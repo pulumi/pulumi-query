@@ -13,7 +13,13 @@
 // limitations under the License.
 
 import { IterableBase } from "./base";
-import { AsyncQueryable, AsyncQuerySource, Grouping, Operator, OrderKey } from "./interfaces";
+import {
+    AsyncQueryable,
+    AsyncQueryableGrouping,
+    AsyncQuerySource,
+    Operator,
+    OrderKey,
+} from "./interfaces";
 import {
     aggregate,
     all,
@@ -181,7 +187,7 @@ export class AsyncQueryableImpl<TSource> extends IterableBase<TSource>
     public groupBy<TKey, TResult = TSource>(
         keySelector: (t: TSource) => TKey | Promise<TKey>,
         elementSelector?: (t: TSource) => TResult | Promise<TResult>,
-    ): AsyncQueryable<Grouping<TKey, TResult>> {
+    ): AsyncQueryable<AsyncQueryableGrouping<TKey, TResult>> {
         return this.pipe(async function*(source: AsyncIterableIterator<TSource>) {
             const groups = await groupBy(keySelector, elementSelector)(source);
             for await (const group of groups) {
@@ -423,7 +429,7 @@ export class AsyncQueryableImpl<TSource> extends IterableBase<TSource>
 }
 
 export class GroupingImpl<TKey, TSource> extends AsyncQueryableImpl<TSource>
-    implements Grouping<TKey, TSource> {
+    implements AsyncQueryableGrouping<TKey, TSource> {
     constructor(public readonly key: TKey, group: AsyncIterableIterator<TSource>) {
         super(group);
     }

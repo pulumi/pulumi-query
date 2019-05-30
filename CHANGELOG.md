@@ -9,5 +9,10 @@
   "convenience methods" for various operators (_e.g._, the `map` in `xs.map(x =>
   x)`).
 
+### Improvements
+
+- Minor fix in polyfill code for `asyncIterable`: don't polyfill on objects where the property is
+  readonly.
+
 [linq-ops]: https://docs.microsoft.com/en-us/previous-versions/dotnet/articles/bb394939(v=msdn.10)
 [async-iter]: https://github.com/tc39/proposal-async-iteration

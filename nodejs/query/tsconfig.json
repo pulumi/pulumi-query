@@ -1,4 +1,5 @@
 {
+    "lib": ["esnext.asynciterable"],
     "compilerOptions": {
         "outDir": "bin",
         "target": "es6",

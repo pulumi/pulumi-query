@@ -21,7 +21,9 @@
 // Polyfill the async iterator per the "caveats" section of the feature release notes:
 // https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-3.html#the-for-await-of-statement
 //
-(Symbol as any).asyncIterator = Symbol.asyncIterator || Symbol.for("Symbol.asyncIterator");
+if (typeof (Symbol as any).asyncIterator === "undefined") {
+    (Symbol as any).asyncIterator = Symbol.asyncIterator || Symbol.for("Symbol.asyncIterator");
+}
 
 import { AsyncQueryableImpl } from "./asyncQueryable";
 import { AsyncQueryable, AsyncQuerySource } from "./interfaces";

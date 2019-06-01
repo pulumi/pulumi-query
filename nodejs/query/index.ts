@@ -26,7 +26,7 @@ if (typeof (Symbol as any).asyncIterator === "undefined") {
 }
 
 import { AsyncQueryableImpl } from "./asyncQueryable";
-import { AsyncQueryable, AsyncQuerySource } from "./interfaces";
+import { AsyncIterableIterator, AsyncQueryable, AsyncQuerySource } from "./interfaces";
 import * as sources from "./sources";
 
 export { AsyncQueryable, AsyncQueryableGrouping, OrderKey } from "./interfaces";

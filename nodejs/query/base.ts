@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GroupedAsyncIterableIterator } from "./interfaces";
+import { AsyncIterableIterator, GroupedAsyncIterableIterator } from "./interfaces";
 
 export abstract class IterableBase<T> implements AsyncIterableIterator<T> {
     constructor(private readonly core: AsyncIterableIterator<T>) {}

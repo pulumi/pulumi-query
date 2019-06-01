@@ -1,4 +1,11 @@
-## Unreleased
+## v0.2.0
+
+### Improvements
+
+- Don't require users to supply `es2018.asynciterable` to `.compilationOptions.libs` when compiling
+  against this library.
+
+## v0.1.0
 
 ### Major Changes
 

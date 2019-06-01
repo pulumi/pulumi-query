@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { AsyncIterable } from "./interfaces";
+
 export function isAsyncIterable<T>(o: any): o is AsyncIterable<T> {
     return typeof o[Symbol.asyncIterator] === "function";
 }

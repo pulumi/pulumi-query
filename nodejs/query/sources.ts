@@ -12,10 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { AsyncQuerySource, isAsyncIterable } from "./interfaces";
+import {
+    AsyncIterable,
+    AsyncIterableIterator,
+    AsyncQuerySource,
+    isAsyncIterable,
+} from "./interfaces";
 import { isIterable } from "./util";
 
-export async function* range(start: number, end?: number) {
+export async function* range(start: number, end?: number): AsyncIterableIterator<number> {
     let i = start;
     while (true) {
         if (end !== undefined && i >= end) {

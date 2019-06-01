@@ -12,6 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+///////////////////////////////////////////////////////////////////////////////
+
+// es2018.asynciterator types.
+//
+// Type definitions contained in the `es2018.asynciterable` library. These are
+// included here so that users do not have to add this string to
+// `.compilationOptions.libs`.
+
+///////////////////////////////////////////////////////////////////////////////
+
+export interface AsyncIterator<T> {
+    next(value?: any): Promise<IteratorResult<T>>;
+    return?(value?: any): Promise<IteratorResult<T>>;
+    throw?(e?: any): Promise<IteratorResult<T>>;
+}
+
+export interface AsyncIterable<T> {
+    [Symbol.asyncIterator](): AsyncIterator<T>;
+}
+
+export interface AsyncIterableIterator<T> extends AsyncIterator<T> {
+    [Symbol.asyncIterator](): AsyncIterableIterator<T>;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 export function isAsyncIterable<T>(o: any): o is AsyncIterable<T> {
     return typeof o[Symbol.asyncIterator] === "function";
 }

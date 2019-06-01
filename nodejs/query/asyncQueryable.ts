@@ -14,6 +14,7 @@
 
 import { IterableBase } from "./base";
 import {
+    AsyncIterableIterator,
     AsyncQueryable,
     AsyncQueryableGrouping,
     AsyncQuerySource,

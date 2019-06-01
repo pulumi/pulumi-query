@@ -1,3 +1,11 @@
+## v0.3.0
+
+### Improvements
+
+- Re-declare the global `SymbolConstructor` with `asyncIterator`, allowing users targeting ES
+  versions earlier than the 2018 to use this library.
+
+
 ## v0.2.0
 
 ### Improvements

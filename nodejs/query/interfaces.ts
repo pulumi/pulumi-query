@@ -22,6 +22,12 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
+declare global {
+    export interface SymbolConstructor {
+        readonly asyncIterator: symbol;
+    }
+}
+
 export interface AsyncIterator<T> {
     next(value?: any): Promise<IteratorResult<T>>;
     return?(value?: any): Promise<IteratorResult<T>>;

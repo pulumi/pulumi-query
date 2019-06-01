@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "outDir": "bin",
-        "target": "es5",
+        "target": "es6",
         "module": "commonjs",
         "moduleResolution": "node",
         "declaration": true,
@@ -14,7 +14,6 @@
         "noImplicitReturns": true,
         "forceConsistentCasingInFileNames": true,
         "strictNullChecks": true,
-        "downlevelIteration": true,
     },
     "files": [
         "asyncQueryable.ts",

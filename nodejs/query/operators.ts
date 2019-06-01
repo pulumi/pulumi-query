@@ -15,6 +15,8 @@
 import { isBoolean, isNumber, isString } from "util";
 import { GroupedAsyncIterableIteratorImpl } from "./base";
 import {
+    AsyncIterable,
+    AsyncIterableIterator,
     AsyncQuerySource,
     Evaluator,
     GroupedAsyncIterableIterator,
@@ -846,7 +848,7 @@ export async function* zip<TSource1, TSource2, TResult = [TSource1, TSource2]>(
     source2: AsyncIterableIterator<TSource2>,
     resultSelector: (t1: TSource1, t2: TSource2) => TResult | Promise<TResult> = (t1, t2) =>
         <TResult>(<unknown>[t1, t2]),
-) {
+): AsyncIterableIterator<TResult> {
     while (true) {
         const result1 = await source1.next();
         const result2 = await source2.next();

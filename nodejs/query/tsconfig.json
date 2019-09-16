@@ -22,7 +22,6 @@
         "operators.ts",
         "sources.ts",
         "base.ts",
-        "util.ts",
 
         "tests/asyncQueryable.spec.ts"
     ]

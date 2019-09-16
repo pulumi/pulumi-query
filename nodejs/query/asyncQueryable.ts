@@ -14,7 +14,6 @@
 
 import { IterableBase } from "./base";
 import {
-    AsyncIterableIterator,
     AsyncQueryable,
     AsyncQueryableGrouping,
     AsyncQuerySource,
@@ -61,9 +60,8 @@ import {
     toArray,
     toMap,
     union,
-    zip,
 } from "./operators";
-import { from, range } from "./sources";
+import { from } from "./sources";
 
 export class AsyncQueryableImpl<TSource> extends IterableBase<TSource>
     implements AsyncQueryable<TSource> {
@@ -72,10 +70,10 @@ export class AsyncQueryableImpl<TSource> extends IterableBase<TSource>
     //
 
     public static from<TSource>(source: AsyncQuerySource<TSource>): AsyncQueryableImpl<TSource> {
-        return new AsyncQueryableImpl(from(source));
+        return new AsyncQueryableImpl(source);
     }
 
-    protected constructor(source: AsyncIterableIterator<TSource>) {
+    protected constructor(source: AsyncQuerySource<TSource>) {
         super(source);
     }
 
@@ -189,10 +187,10 @@ export class AsyncQueryableImpl<TSource> extends IterableBase<TSource>
         keySelector: (t: TSource) => TKey | Promise<TKey>,
         elementSelector?: (t: TSource) => TResult | Promise<TResult>,
     ): AsyncQueryable<AsyncQueryableGrouping<TKey, TResult>> {
-        return this.pipe(async function*(source: AsyncIterableIterator<TSource>) {
-            const groups = await groupBy(keySelector, elementSelector)(source);
+        return this.pipe(async function*(source: AsyncIterable<TSource>) {
+            const groups = groupBy(keySelector, elementSelector)(source);
             for await (const group of groups) {
-                yield new GroupingImpl(group.key, from(group));
+                yield new GroupingImpl(group.key, group);
             }
         });
     }
@@ -286,7 +284,7 @@ export class AsyncQueryableImpl<TSource> extends IterableBase<TSource>
     // Aggregate operators.
     //
 
-    public count(predicate?: (t: TSource) => boolean | Promise<boolean>): Promise<number> {
+    public async count(predicate?: (t: TSource) => boolean | Promise<boolean>): Promise<number> {
         return count(predicate)(this);
     }
 
@@ -414,24 +412,23 @@ export class AsyncQueryableImpl<TSource> extends IterableBase<TSource>
         ...ops: Operator<any, any>[]
     ): AsyncQueryable<TResult9>;
     public pipe(...ops: Operator<any, any>[]): AsyncQueryable<any> {
-        return new AsyncQueryableImpl(
-            (async function*(source: AsyncIterableIterator<TSource>) {
-                let newSource = source;
-                for (const op of ops) {
-                    newSource = op(newSource);
-                }
+        const src = async function*(source: AsyncQuerySource<TSource>) {
+            let newSource = from(source);
+            for (const op of ops) {
+                newSource = op(newSource);
+            }
 
-                for await (const t of newSource) {
-                    yield t;
-                }
-            })(this),
-        );
+            for await (const t of newSource) {
+                yield t;
+            }
+        };
+        return new AsyncQueryableImpl(from(() => src(this.source)));
     }
 }
 
 export class GroupingImpl<TKey, TSource> extends AsyncQueryableImpl<TSource>
     implements AsyncQueryableGrouping<TKey, TSource> {
-    constructor(public readonly key: TKey, group: AsyncIterableIterator<TSource>) {
+    constructor(public readonly key: TKey, group: AsyncIterable<TSource>) {
         super(group);
     }
 }

@@ -12,23 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { AsyncIterableIterator, GroupedAsyncIterableIterator } from "./interfaces";
+import { AsyncQuerySource, GroupedAsyncIterable } from "./interfaces";
+import { from } from "./sources";
 
-export abstract class IterableBase<T> implements AsyncIterableIterator<T> {
-    constructor(private readonly core: AsyncIterableIterator<T>) {}
+export abstract class IterableBase<T> implements AsyncIterable<T> {
+    constructor(protected readonly source: AsyncQuerySource<T>) {}
 
-    [Symbol.asyncIterator](): AsyncIterableIterator<T> {
-        return this;
-    }
-
-    public next(value?: any): Promise<IteratorResult<T>> {
-        return this.core.next(value);
+    [Symbol.asyncIterator]() {
+        return from(this.source)[Symbol.asyncIterator]();
     }
 }
 
-export class GroupedAsyncIterableIteratorImpl<TKey, TSource> extends IterableBase<TSource>
-    implements GroupedAsyncIterableIterator<TKey, TSource> {
-    constructor(public readonly key: TKey, core: AsyncIterableIterator<TSource>) {
+export class GroupedAsyncIterableImpl<TKey, TSource> extends IterableBase<TSource>
+    implements GroupedAsyncIterable<TKey, TSource> {
+    constructor(public readonly key: TKey, core: AsyncIterable<TSource>) {
         super(core);
     }
 }

@@ -45,30 +45,25 @@ export interface AsyncIterableIterator<T> extends AsyncIterator<T> {
 ///////////////////////////////////////////////////////////////////////////////
 
 export function isAsyncIterable<T>(o: any): o is AsyncIterable<T> {
-    return typeof o[Symbol.asyncIterator] === "function";
+    return o !== undefined && typeof o[Symbol.asyncIterator] === "function";
 }
 
 export function isIterable<T>(o: any): o is Iterable<T> {
-    return typeof o[Symbol.iterator] === "function";
+    return o !== undefined && typeof o[Symbol.iterator] === "function";
 }
 
-export type Operator<TSource, TResult> = (
-    source: AsyncIterableIterator<TSource>,
-) => AsyncIterableIterator<TResult>;
+export type Operator<TSource, TResult> = (source: AsyncIterable<TSource>) => AsyncIterable<TResult>;
 
-export type Evaluator<TSource, TResult> = (
-    source: AsyncIterableIterator<TSource>,
-) => Promise<TResult>;
+export type Evaluator<TSource, TResult> = (source: AsyncIterable<TSource>) => Promise<TResult>;
 
 export type AsyncQuerySource<TSource> =
     | Iterable<TSource>
     | AsyncIterable<TSource>
-    | Promise<Iterable<TSource>>
-    | Promise<AsyncIterable<TSource>>;
+    | (() => Iterable<TSource> | AsyncIterable<TSource>);
 
 export type OrderKey = string | number;
 
-export interface AsyncQueryable<TSource> extends AsyncIterableIterator<TSource> {
+export interface AsyncQueryable<TSource> extends AsyncIterable<TSource> {
     //
     // Restriction operators.
     //
@@ -544,11 +539,10 @@ export interface AsyncQueryable<TSource> extends AsyncIterableIterator<TSource> 
     ): AsyncQueryable<TResult9>;
 }
 
-export interface GroupedAsyncIterableIterator<TKey, TSource>
-    extends AsyncIterableIterator<TSource> {
+export interface GroupedAsyncIterable<TKey, TSource> extends AsyncIterable<TSource> {
     key: TKey;
 }
 
-export interface AsyncQueryableGrouping<TKey, TSource>
-    extends GroupedAsyncIterableIterator<TKey, TSource>,
-        AsyncQueryable<TSource> {}
+export interface AsyncQueryableGrouping<TKey, TSource> extends AsyncQueryable<TSource> {
+    key: TKey;
+}

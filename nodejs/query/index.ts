@@ -26,7 +26,7 @@ if (typeof (Symbol as any).asyncIterator === "undefined") {
 }
 
 import { AsyncQueryableImpl } from "./asyncQueryable";
-import { AsyncIterableIterator, AsyncQueryable, AsyncQuerySource } from "./interfaces";
+import { AsyncQueryable, AsyncQuerySource } from "./interfaces";
 import * as sources from "./sources";
 
 export { AsyncQueryable, AsyncQueryableGrouping, OrderKey } from "./interfaces";
@@ -58,7 +58,7 @@ export function range(start: number, stop?: number): AsyncQueryable<number> {
  * @example
  * const noNumbers = await empty<number>().toArray(); // == []
  */
-export function empty<TResult>(): AsyncIterableIterator<TResult> {
+export function empty<TResult>(): AsyncQueryable<TResult> {
     return AsyncQueryableImpl.from(sources.from([]));
 }
 

@@ -12,41 +12,52 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-    AsyncIterable,
-    AsyncIterableIterator,
-    AsyncQuerySource,
-    isAsyncIterable,
-} from "./interfaces";
-import { isIterable } from "./util";
+import { AsyncQuerySource, isIterable } from "./interfaces";
 
-export async function* range(start: number, end?: number): AsyncIterableIterator<number> {
-    let i = start;
-    while (true) {
-        if (end !== undefined && i >= end) {
-            return;
-        }
-        yield i++;
-    }
+function wrapAsyncIterable<T>(
+    makeIterable: () => Iterable<T> | AsyncIterable<T>,
+): AsyncIterable<T> {
+    return {
+        [Symbol.asyncIterator]() {
+            const iterable = makeIterable();
+            if (isIterable(iterable)) {
+                const iterator = iterable[Symbol.iterator]();
+                return {
+                    async next() {
+                        return iterator.next();
+                    },
+                };
+            } else {
+                return iterable[Symbol.asyncIterator]();
+            }
+        },
+    };
 }
 
-export async function* from<TSource>(
-    source: AsyncQuerySource<TSource>,
-): AsyncIterableIterator<TSource> {
-    let iter: Iterable<TSource> | AsyncIterable<TSource>;
-    if (isIterable(source) || isAsyncIterable(source)) {
-        iter = source;
-    } else {
-        iter = await source;
-    }
+export function range(start: number, end?: number): AsyncIterable<number> {
+    return wrapAsyncIterable(async function*() {
+        let i = start;
+        while (true) {
+            if (end !== undefined && i >= end) {
+                return;
+            }
+            yield i++;
+        }
+    });
+}
 
-    if (isIterable(iter)) {
-        for (const t of iter) {
-            yield t;
-        }
-    } else {
-        for await (const t of iter) {
-            yield t;
-        }
-    }
+export function from<TSource>(source: AsyncQuerySource<TSource>): AsyncIterable<TSource> {
+    return source instanceof Function
+        ? wrapAsyncIterable(source)
+        : wrapAsyncIterable(async function*() {
+              if (isIterable(source)) {
+                  for (const t of source) {
+                      yield t;
+                  }
+              } else {
+                  for await (const t of source) {
+                      yield t;
+                  }
+              }
+          });
 }

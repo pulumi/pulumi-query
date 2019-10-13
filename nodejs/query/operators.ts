@@ -13,9 +13,11 @@
 // limitations under the License.
 
 import { isBoolean, isNumber, isString } from "util";
+import { AsyncQueryableImpl } from "./asyncQueryable";
 import { GroupedAsyncIterableImpl } from "./base";
 import {
     AsyncIterable,
+    AsyncQueryable,
     AsyncQuerySource,
     Evaluator,
     GroupedAsyncIterable,
@@ -46,7 +48,10 @@ export function filter<TSource>(
 //
 
 export function flatMap<TSource, TInner, TResult = TInner>(
-    selector: (t: TSource, index: number) => AsyncQuerySource<TInner>,
+    selector: (
+        t: TSource,
+        index: number,
+    ) => AsyncQuerySource<TInner> | Promise<AsyncQuerySource<TInner>>,
     resultSelector: (t: TSource, ti: TInner) => TResult | Promise<TResult> = (t, ti) =>
         <TResult>(<unknown>ti),
 ): Operator<TSource, TResult> {
@@ -54,7 +59,7 @@ export function flatMap<TSource, TInner, TResult = TInner>(
         from(async function*() {
             for await (const [t, i] of zip(source, range(0))) {
                 const us = selector(t, i);
-                for await (const u of from(us)) {
+                for await (const u of from(await us)) {
                     yield await resultSelector(t, u);
                 }
             }
@@ -192,21 +197,52 @@ export function join<TOuter, TInner, TKey, TResult>(
         });
 }
 
+async function* groupJoinHelper<TOuter, TInner, TKey, TResult>(
+    outer: AsyncIterable<TOuter>,
+    inner: AsyncIterable<TInner>,
+    outerKeySelector: (to: TOuter) => TKey | Promise<TKey>,
+    innerKeySelector: (ti: TInner) => TKey | Promise<TKey>,
+): AsyncIterable<[TOuter, TInner[]]> {
+    const inners = new Map<TKey, TInner[]>();
+
+    for await (const t of inner) {
+        const key = await innerKeySelector(t);
+        const val = <TInner[]>inners.get(key);
+        if (inners.has(key)) {
+            val.push(t);
+        } else {
+            inners.set(key, [t]);
+        }
+    }
+
+    for await (const t of outer) {
+        const key = await outerKeySelector(t);
+        if (key === undefined) {
+            continue;
+        } else if (inners.has(key)) {
+            const innerValues = <TInner[]>inners.get(key);
+            yield [t, innerValues];
+        } else {
+            yield [t, []];
+        }
+    }
+}
+
 export function groupJoin<TOuter, TInner, TKey, TResult>(
     inner: AsyncIterable<TInner>,
     outerKeySelector: (to: TOuter) => TKey | Promise<TKey>,
     innerKeySelector: (ti: TInner) => TKey | Promise<TKey>,
-    resultSelector: (to: TOuter, ti: AsyncQuerySource<TInner>) => TResult | Promise<TResult>,
+    resultSelector: (to: TOuter, ti: AsyncQueryable<TInner>) => TResult | Promise<TResult>,
 ): Operator<TOuter, TResult> {
     return outer =>
         from(async function*() {
-            for await (const [o, inners] of joinHelper(
+            for await (const [o, inners] of groupJoinHelper(
                 outer,
                 inner,
                 outerKeySelector,
                 innerKeySelector,
             )) {
-                yield await resultSelector(o, from(inners));
+                yield await resultSelector(o, AsyncQueryableImpl.from(inners));
             }
         });
 }

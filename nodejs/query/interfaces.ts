@@ -101,7 +101,10 @@ export interface AsyncQueryable<TSource> extends AsyncIterable<TSource> {
      * await customers.flatMap(customer => customer.orders, (customer, order) => [customer, order]);
      */
     flatMap<TInner, TResult = TInner>(
-        transform: (t: TSource, index: number) => AsyncQuerySource<TInner>, // TODO: Make this iterable.
+        transform: (
+            t: TSource,
+            index: number,
+        ) => AsyncQuerySource<TInner> | Promise<AsyncQuerySource<TInner>>, // TODO: Make this iterable.
         resultTransform?: (t: TSource, ti: TInner) => TResult | Promise<TResult>,
     ): AsyncQueryable<TResult>;
 
@@ -173,7 +176,7 @@ export interface AsyncQueryable<TSource> extends AsyncIterable<TSource> {
         inner: AsyncQuerySource<TInner>,
         outerKeySelector: (to: TSource) => TKey | Promise<TKey>,
         innerKeySelector: (ti: TInner) => TKey | Promise<TKey>,
-        resultSelector: (to: TSource, ti: AsyncQuerySource<TInner>) => TResult | Promise<TResult>,
+        resultSelector: (to: TSource, ti: AsyncQueryable<TInner>) => TResult | Promise<TResult>,
     ): AsyncQueryable<TResult>;
 
     //

@@ -16,7 +16,7 @@ import * as assert from "assert";
 
 import { from, range } from "..";
 import { AsyncQueryableImpl } from "../asyncQueryable";
-import { isAsyncIterable, Operator } from "../interfaces";
+import { AsyncQueryable, isAsyncIterable, Operator } from "../interfaces";
 
 function assertRejects(done: MochaDone, p: Promise<any>) {
     p.then(() => {
@@ -494,6 +494,47 @@ describe("IterablePromise join operators", () => {
             assert.deepEqual(await xs.toArray(), [[1, 1], [2, 2], [2, 2], [2, 2], [2, 2]]);
             assert.deepEqual(await xs.count(), 5);
             assert.deepEqual(await xs.count(), 5);
+        });
+    });
+
+    describe("groupJoin", () => {
+        it("groups multiple records to one joined record", async () => {
+            let xs = AsyncQueryableImpl.from([1, 2, 2, 3, 4, 5]).groupJoin(
+                [1, 2],
+                x => x,
+                x => x,
+                async (x, y) => [x, await y.toArray()] as [number, number[]][],
+            );
+            assert.deepEqual(await xs.toArray(), [
+                [1, [1]],
+                [2, [2]],
+                [2, [2]],
+                [3, []],
+                [4, []],
+                [5, []],
+            ]);
+            assert.deepEqual(await xs.count(), 6);
+            assert.deepEqual(await xs.count(), 6);
+
+            xs = AsyncQueryableImpl.from([1, 2]).groupJoin(
+                [1, 2, 2, 3, 4, 5],
+                x => x,
+                x => x,
+                async (x, y) => [x, await y.toArray()] as [number, number[]][],
+            );
+            assert.deepEqual(await xs.toArray(), [[1, [1]], [2, [2, 2]]]);
+            assert.deepEqual(await xs.count(), 2);
+            assert.deepEqual(await xs.count(), 2);
+
+            xs = AsyncQueryableImpl.from([1, 2, 2]).groupJoin(
+                [1, 2, 2, 3, 4, 5],
+                x => x,
+                x => x,
+                async (x, y) => [x, await y.toArray()] as [number, number[]][],
+            );
+            assert.deepEqual(await xs.toArray(), [[1, [1]], [2, [2, 2]], [2, [2, 2]]]);
+            assert.deepEqual(await xs.count(), 3);
+            assert.deepEqual(await xs.count(), 3);
         });
     });
 });

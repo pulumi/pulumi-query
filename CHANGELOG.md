@@ -4,7 +4,8 @@
 
 - Re-declare the global `SymbolConstructor` with `asyncIterator`, allowing users targeting ES
   versions earlier than the 2018 to use this library.
-
+- Fix issue preventing double-invoke of queries.
+- Fix incorrect `groupJoin` semantics.
 
 ## v0.2.0
 

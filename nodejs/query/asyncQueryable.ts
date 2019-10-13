@@ -90,7 +90,10 @@ export class AsyncQueryableImpl<TSource> extends IterableBase<TSource>
     //
 
     public flatMap<TInner, TResult = TInner>(
-        selector: (t: TSource, index: number) => AsyncQuerySource<TInner>,
+        selector: (
+            t: TSource,
+            index: number,
+        ) => AsyncQuerySource<TInner> | Promise<AsyncQuerySource<TInner>>,
         resultSelector: (t: TSource, ti: TInner) => TResult | Promise<TResult> = (t, ti) =>
             <TResult>(<unknown>ti),
     ): AsyncQueryable<TResult> {
@@ -144,7 +147,7 @@ export class AsyncQueryableImpl<TSource> extends IterableBase<TSource>
         inner: AsyncQuerySource<TInner>,
         outerKeySelector: (to: TSource) => TKey | Promise<TKey>,
         innerKeySelector: (ti: TInner) => TKey | Promise<TKey>,
-        resultSelector: (to: TSource, ti: AsyncQuerySource<TInner>) => TResult | Promise<TResult>,
+        resultSelector: (to: TSource, ti: AsyncQueryable<TInner>) => TResult | Promise<TResult>,
     ): AsyncQueryable<TResult> {
         return this.pipe(
             groupJoin(from(inner), outerKeySelector, innerKeySelector, resultSelector),

@@ -47,7 +47,9 @@ export function range(start: number, end?: number): AsyncIterable<number> {
 }
 
 export function from<TSource>(source: AsyncQuerySource<TSource>): AsyncIterable<TSource> {
-    return source instanceof Function
+    return source === undefined
+        ? wrapAsyncIterable(() => [])
+        : source instanceof Function
         ? wrapAsyncIterable(source)
         : wrapAsyncIterable(async function*() {
               if (isIterable(source)) {

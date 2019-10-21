@@ -6,6 +6,7 @@
   versions earlier than the 2018 to use this library.
 - Fix issue preventing double-invoke of queries.
 - Fix incorrect `groupJoin` semantics.
+- Allow `from` to gracefully handle stray `undefined` passed as argument.
 
 ## v0.2.0
 

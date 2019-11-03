@@ -158,7 +158,9 @@ export class AsyncQueryableImpl<TSource> extends IterableBase<TSource>
     // Concatenation operators.
     //
 
-    public concat(iter: AsyncQuerySource<TSource>): AsyncQueryable<TSource> {
+    public concat<TSource2 = TSource>(
+        iter: AsyncQuerySource<TSource2>,
+    ): AsyncQueryable<TSource | TSource2> {
         return this.pipe(concat(from(iter)));
     }
 

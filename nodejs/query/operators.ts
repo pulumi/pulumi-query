@@ -251,7 +251,9 @@ export function groupJoin<TOuter, TInner, TKey, TResult>(
 // Concatenation operators.
 //
 
-export function concat<TSource>(iter: AsyncIterable<TSource>): Operator<TSource, TSource> {
+export function concat<TSource, TSource2 = TSource>(
+    iter: AsyncIterable<TSource2>,
+): Operator<TSource, TSource | TSource2> {
     return source =>
         from(async function*() {
             for await (const t of source) {

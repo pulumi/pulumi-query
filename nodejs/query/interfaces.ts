@@ -187,7 +187,9 @@ export interface AsyncQueryable<TSource> extends AsyncIterable<TSource> {
      * Concatenates two sequences.
      * @param second Sequence to concatenate to `this` sequence.
      */
-    concat(second: AsyncQuerySource<TSource>): AsyncQueryable<TSource>;
+    concat<TSource2 = TSource>(
+        second: AsyncQuerySource<TSource2>,
+    ): AsyncQueryable<TSource | TSource2>;
 
     //
     // Ordering operators.

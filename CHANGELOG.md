@@ -1,3 +1,10 @@
+## v0.6.0
+
+### Improvements
+
+- Fix `AsyncQueryable#concat` interface type to accurately reflect the underlying type of the
+  implementation.
+
 ## v0.5.0
 
 ### Improvements

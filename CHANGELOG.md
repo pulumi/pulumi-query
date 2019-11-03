@@ -1,3 +1,11 @@
+## v0.5.0
+
+### Improvements
+
+- Allow `xs` and `ys` to be separate types in `xs.concat(ys)`.
+
+## v0.4.0
+
 ## v0.3.0
 
 ### Improvements

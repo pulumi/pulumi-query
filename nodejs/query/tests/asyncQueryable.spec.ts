@@ -563,6 +563,23 @@ describe("IterablePromise concatenation operators", () => {
             assert.deepEqual(await xs.count(), 2);
         });
 
+        it("concats sources of multiple types", async () => {
+            let xs = AsyncQueryableImpl.from([1, 2]).concat(["foo", "bar"]);
+            assert.deepEqual(await xs.toArray(), [1, 2, "foo", "bar"]);
+            assert.deepEqual(await xs.count(), 4);
+            assert.deepEqual(await xs.count(), 4);
+
+            xs = AsyncQueryableImpl.from<number>([]).concat(["foo", "bar"]);
+            assert.deepEqual(await xs.toArray(), ["foo", "bar"]);
+            assert.deepEqual(await xs.count(), 2);
+            assert.deepEqual(await xs.count(), 2);
+
+            xs = AsyncQueryableImpl.from([1, 2]).concat([]);
+            assert.deepEqual(await xs.toArray(), [1, 2]);
+            assert.deepEqual(await xs.count(), 2);
+            assert.deepEqual(await xs.count(), 2);
+        });
+
         it("concats Promise<T[]>", async () => {
             let xs = AsyncQueryableImpl.from([1, 2]).concat([3, 4]);
             assert.deepEqual(await xs.toArray(), [1, 2, 3, 4]);
